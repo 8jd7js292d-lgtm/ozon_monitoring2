@@ -14,7 +14,7 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 
-CHAT_ID = 123456789  # поставь свой Telegram ID
+CHAT_ID = 401758093  
 
 
 @dp.message()
