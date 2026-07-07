@@ -1,4 +1,6 @@
 import aiohttp
+import re
+import html
 
 
 async def check_ozon(url):
@@ -8,8 +10,21 @@ async def check_ozon(url):
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
-            html = await response.text()
+            page = await response.text()
 
-    return [
-        html[:500]
-    ]
+    page = html.unescape(page)
+
+    # ищем цены в скрытых данных
+    prices = re.findall(r'\d{3,6}\s?₽', page)
+
+    result = []
+
+    for price in prices:
+        price = price.replace(" ", "")
+        if price not in result:
+            result.append(price)
+
+    if result:
+        return result[:10]
+
+    return ["Цены пока не найдены"]
