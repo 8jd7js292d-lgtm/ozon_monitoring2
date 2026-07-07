@@ -51,3 +51,18 @@ def get_products():
     conn.close()
 
     return data
+
+
+def update_price(url, price):
+    conn = sqlite3.connect(DB_NAME)
+    cur = conn.cursor()
+
+    cur.execute("""
+    UPDATE products
+    SET price = ?, updated = datetime('now')
+    WHERE url = ?
+    """,
+    (price, url))
+
+    conn.commit()
+    conn.close()
