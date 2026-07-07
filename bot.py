@@ -4,7 +4,8 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 
-from database import init_db, add_product
+from database import init_db, add_product, get_products
+from price_checker import get_price
 
 
 TOKEN = os.getenv("BOT_TOKEN")
@@ -32,14 +33,39 @@ async def messages(message: Message):
         )
 
         await message.answer(
-            "✅ Товар добавлен в мониторинг\n"
-            "Скоро начну следить за ценой 🔥"
+            "✅ Добавил товар в мониторинг 🔥"
         )
 
+    elif text == "/check":
+
+        products = get_products()
+
+        if not products:
+            await message.answer(
+                "Список товаров пуст"
+            )
+            return
+
+        result = "🔎 Проверка цен:\n\n"
+
+        for url, name, old_price in products:
+
+            new_price = await get_price(url)
+
+            result += (
+                f"📦 {name}\n"
+                f"Старая цена: {old_price} ₽\n"
+                f"Новая цена: {new_price} ₽\n\n"
+            )
+
+        await message.answer(result)
+
     else:
+
         await message.answer(
-            "Используй:\n"
-            "/add ссылка_на_товар"
+            "Команды:\n"
+            "/add ссылка\n"
+            "/check проверка цен"
         )
 
 
@@ -49,7 +75,7 @@ async def main():
 
     await bot.send_message(
         CHAT_ID,
-        "🤖 База подключена. Мониторинг готов!"
+        "🤖 Мониторинг запущен!"
     )
 
     await dp.start_polling(bot)
