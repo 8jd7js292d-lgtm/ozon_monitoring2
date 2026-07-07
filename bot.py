@@ -24,16 +24,14 @@ def load_products():
 
 def save_products(products):
     with open(FILE, "w", encoding="utf-8") as f:
-        json.dump(
-            products,
-            f,
-            ensure_ascii=False,
-            indent=2
-        )
+        json.dump(products, f, ensure_ascii=False, indent=2)
 
 
 @dp.message()
 async def handler(message: Message):
+
+    if not message.text:
+        return
 
     text = message.text
 
@@ -60,19 +58,18 @@ async def handler(message: Message):
         products = load_products()
 
         if not products:
-            await message.answer(
-                "Список пуст"
-            )
+            await message.answer("Список пуст")
             return
 
         answer = "📦 Товары:\n\n"
 
         for p in products:
-            answer += p["url"] + "\n\n"
+            answer += f"{p['url']}\n\n"
 
         await message.answer(answer)
 
     else:
+
         await message.answer(
             "Команды:\n"
             "/add ссылка\n"
@@ -81,12 +78,6 @@ async def handler(message: Message):
 
 
 async def main():
-
-    await bot.send_message(
-        message.chat.id if False else 0,
-        "🤖 Запущен"
-    )
-
     await dp.start_polling(bot)
 
 
