@@ -1,39 +1,58 @@
 import os
-import json
 import asyncio
 
-from aiogram import Bot
-from ozon_monitor import check_ozon
+from aiogram import Bot, Dispatcher
+from aiogram.types import Message
+
+from database import init_db, add_product
 
 
 TOKEN = os.getenv("BOT_TOKEN")
-CHAT_ID = 401758093  
+
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
+
+
+CHAT_ID = 123456789  # замени на свой ID
+
+
+@dp.message()
+async def messages(message: Message):
+
+    text = message.text
+
+    if text.startswith("/add"):
+
+        url = text.replace("/add", "").strip()
+
+        add_product(
+            url,
+            "Товар Ozon",
+            0
+        )
+
+        await message.answer(
+            "✅ Товар добавлен в мониторинг\n"
+            "Скоро начну следить за ценой 🔥"
+        )
+
+    else:
+        await message.answer(
+            "Используй:\n"
+            "/add ссылка_на_товар"
+        )
 
 
 async def main():
-    bot = Bot(token=TOKEN)
 
-    with open("products.json", "r", encoding="utf-8") as f:
-        products = json.load(f)
-
-    message = "🔎 Проверка Ozon\n\n"
-
-    for product in products:
-        prices = await check_ozon(product["url"])
-
-        message += f"📦 {product['name']}\n"
-
-        if prices:
-            message += f"💰 Цены: {', '.join(prices)}\n\n"
-        else:
-            message += "Цены не найдены\n\n"
+    init_db()
 
     await bot.send_message(
-        chat_id=CHAT_ID,
-        text=message
+        CHAT_ID,
+        "🤖 База подключена. Мониторинг готов!"
     )
 
-    await bot.session.close()
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
