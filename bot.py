@@ -1,26 +1,16 @@
-import asyncio
 import os
-
-from aiogram import Bot, Dispatcher
-from aiogram.types import Message
+import asyncio
+from aiogram import Bot
 
 TOKEN = os.getenv("BOT_TOKEN")
 
-bot = Bot(token=TOKEN)
-dp = Dispatcher()
-
-
-@dp.message()
-async def start(message: Message):
-    await message.answer(
-        "🤖 Бот запущен!\n"
-        "Охота за скидками Ozon начинается 🔥"
-    )
-
-
 async def main():
-    await dp.start_polling(bot)
-
+    bot = Bot(token=TOKEN)
+    await bot.send_message(
+        chat_id=401758093,
+        text="🤖 Бот запущен через GitHub Actions!"
+    )
+    await bot.session.close()
 
 if __name__ == "__main__":
     asyncio.run(main())
