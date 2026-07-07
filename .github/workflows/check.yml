@@ -3,6 +3,9 @@ name: Ozon Bot
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -10,6 +13,8 @@ jobs:
     steps:
       - name: Download code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Install Python
         uses: actions/setup-python@v5
@@ -18,9 +23,6 @@ jobs:
 
       - name: Install libraries
         run: pip install -r requirements.txt
-
-      - name: Install browser
-        run: playwright install chromium
 
       - name: Run bot
         env:
