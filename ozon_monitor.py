@@ -10,7 +10,9 @@ async def check_ozon(url):
         async with session.get(url, headers=headers) as response:
             html = await response.text()
 
+    print(html[:2000])
+
     return [
-        f"Ответ Ozon получен",
-        f"Размер страницы: {len(html)} символов"
+        "Проверка завершена",
+        f"Размер ответа: {len(html)}"
     ]
