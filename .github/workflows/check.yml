@@ -1,8 +1,6 @@
 name: Ozon Bot
 
 on:
-  schedule:
-    - cron: "*/10 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -18,10 +16,13 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install packages
+      - name: Install libraries
         run: pip install -r requirements.txt
 
-      - name: Start bot
+      - name: Install browser
+        run: playwright install chromium
+
+      - name: Run bot
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: python bot.py
