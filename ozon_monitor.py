@@ -19,10 +19,4 @@ async def check_ozon(url):
 
         await browser.close()
 
-    lines = []
-
-    for line in text.split("\n"):
-        if "₽" in line:
-            lines.append(line)
-
-    return lines[:10] if lines else ["Цены не найдены"]
+    return [text[:1000]]
