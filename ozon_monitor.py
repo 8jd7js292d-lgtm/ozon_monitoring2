@@ -1,36 +1,27 @@
 import aiohttp
-from bs4 import BeautifulSoup
+import re
 
 
 async def check_ozon(url):
     headers = {
-        "User-Agent": "Mozilla/5.0"
+        "User-Agent": (
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) "
+            "AppleWebKit/605.1.15 Safari/604.1"
+        ),
+        "Accept-Language": "ru-RU,ru;q=0.9"
     }
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             html = await response.text()
 
-    soup = BeautifulSoup(html, "lxml")
+    prices = re.findall(r'\d[\d\s]{2,}\s?₽', html)
 
-    prices = []
+    clean = []
 
-    for item in soup.find_all("span"):
-        text = item.text.replace(" ", "")
-        if "₽" in text:
-            prices.append(text)
+    for price in prices:
+        price = price.replace(" ", "")
+        if price not in clean:
+            clean.append(price)
 
-    return prices[:5]
-
-
-async def main():
-    result = await check_ozon(
-        "https://www.ozon.ru/search/?text=iPhone"
-    )
-
-    print(result)
-
-
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    return clean[:10]
