@@ -13,7 +13,7 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 
-CHAT_ID = 123456789  # замени на свой ID
+CHAT_ID = 401758093  
 
 
 @dp.message()
