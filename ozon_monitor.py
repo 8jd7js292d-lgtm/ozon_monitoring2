@@ -1,30 +1,28 @@
-import aiohttp
-import re
-import html
+from playwright.async_api import async_playwright
 
 
 async def check_ozon(url):
-    headers = {
-        "User-Agent": "Mozilla/5.0"
-    }
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
-            page = await response.text()
+        page = await browser.new_page()
 
-    page = html.unescape(page)
+        await page.goto(
+            url,
+            wait_until="domcontentloaded",
+            timeout=60000
+        )
 
-    # ищем цены в скрытых данных
-    prices = re.findall(r'\d{3,6}\s?₽', page)
+        await page.wait_for_timeout(5000)
 
-    result = []
+        text = await page.locator("body").inner_text()
 
-    for price in prices:
-        price = price.replace(" ", "")
-        if price not in result:
-            result.append(price)
+        await browser.close()
 
-    if result:
-        return result[:10]
+    lines = []
 
-    return ["Цены пока не найдены"]
+    for line in text.split("\n"):
+        if "₽" in line:
+            lines.append(line)
+
+    return lines[:10] if lines else ["Цены не найдены"]
